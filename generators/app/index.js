@@ -1,4 +1,5 @@
 var generators = require('yeoman-generator');
+var fs = require('fs');
 
 function trimEndingSlash(url) {
     while (url.length > 0 && url[url.length - 1] === "/") {
@@ -139,6 +140,8 @@ module.exports = generators.Base.extend({
                 var relPath = nonTemplateFilesRelativePathsToCopy[i];
                 this.fs.copy(this.templatePath(relPath), this.destinationPath(relPath));
             }
+
+            fs.writeFileSync(this.destinationPath('.gitignore'), 'config/server.gcfg\n');
 
             done();
         }.bind(this));
