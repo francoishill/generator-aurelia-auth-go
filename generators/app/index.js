@@ -141,7 +141,11 @@ module.exports = generators.Base.extend({
                 this.fs.copy(this.templatePath(relPath), this.destinationPath(relPath));
             }
 
-            fs.writeFileSync(this.destinationPath('.gitignore'), 'config/server.gcfg\n');
+            fs.writeFileSync(this.destinationPath('.gitignore'), [
+                'config/server.gcfg',
+                'config/jwt.rsa',
+                'config/jwt.rsa.pub'
+            ].join("\n"));
 
             done();
         }.bind(this));

@@ -1,6 +1,6 @@
 {
     "name": "generator-aurelia-auth-go",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "description": "A go backend (using common DDD code) for the aurelia-auth-ui generator",
     "files": [
         "generators"
