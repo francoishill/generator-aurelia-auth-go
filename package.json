@@ -1,8 +1,7 @@
 {
     "name": "generator-aurelia-auth-go",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "A go backend (using common DDD code) for the aurelia-auth-ui generator",
-    "repository": "francoishill/generator-aurelia-auth-go",
     "files": [
         "app",
         "router"
@@ -10,5 +9,14 @@
     "keywords": ["yeoman-generator"],
     "dependencies": {
         "yeoman-generator": "^0.20.2"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://francoishill/generator-aurelia-auth-go.git"
+    },
+    "license": "MIT",
+    "author": {
+        "name": "Francois Hill",
+        "email": "francoishill11@gmail.com"
     }
 }
