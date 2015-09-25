@@ -1,0 +1,25 @@
+[Common]
+    DevMode = true
+    UseMock = false
+
+[Server]
+    FrontendUrl = <%= FRONTEND_URL %> # Used to enable Cross-origin resource sharing (CORS)
+    BackendUrl = <%= BACKEND_URL %> # Where the server will run
+
+[Database]
+    MysqlDataSource = dummy_username:dummy_password@tcp(localhost:3306)/dummy_db?loc=Local&timeout=300s&charset=utf8&parseTime=true
+    MysqlMigrationsDir = ./Db/MysqlMigrations
+
+[Redis]
+    HostAndPort = localhost:6379
+    Password = #no password set
+    DB = 0 #use default DB
+
+[Jwt]
+    # Download openssl from https://indy.fulgan.com/SSL/
+    # Choose keysize (here we use 2048)
+    # Then generate pvt key `openssl genrsa -out app.rsa 2048`
+    # and pub key `openssl rsa -in app.rsa -pubout > app.rsa.pub`
+    PrivateKeyFilePath = ./config/jwt.rsa
+    PublicKeyFilePath = ./config/jwt.rsa.pub
+    ExpirationDeltaHours = <%= JWT_EXPIRATION_HOURS %>
