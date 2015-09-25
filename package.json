@@ -1,10 +1,9 @@
 {
     "name": "generator-aurelia-auth-go",
-    "version": "0.1.2",
+    "version": "0.1.5",
     "description": "A go backend (using common DDD code) for the aurelia-auth-ui generator",
     "files": [
-        "app",
-        "router"
+        "generators"
     ],
     "keywords": ["yeoman-generator"],
     "dependencies": {
