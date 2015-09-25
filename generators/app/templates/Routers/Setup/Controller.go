@@ -32,7 +32,7 @@ type deleteHandler interface {
 	Delete(w http.ResponseWriter, r *http.Request, ctx *RouterContext)
 }
 
-func GetControllerMethods(controller Controller) map[string]ControllerMethod {
+func GetControllerMethods(controller Controller, panicOnZeroMethods bool) map[string]ControllerMethod {
 	m := make(map[string]ControllerMethod)
 
 	cnt := 0
@@ -67,7 +67,7 @@ func GetControllerMethods(controller Controller) map[string]ControllerMethod {
 		m["DELETE"] = h.Delete
 	}
 
-	if cnt == 0 {
+	if panicOnZeroMethods && cnt == 0 {
 		panic("Controller must have at least one exposed method 'Get', 'Put', etc.")
 	}
 
