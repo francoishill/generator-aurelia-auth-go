@@ -91,6 +91,26 @@ func setupApiV1Routes(ctx *RouterContext, router *mux.Router) {
 	RegisterRouters(ctx, apiV1Router, baseRouterMiddleware, routers)
 }
 
+func createAndRegisterRoutersHandler(ctx *RouterContext) http.Handler {
+	mainRouter := mux.NewRouter().StrictSlash(true)
+	setupApiV1Routes(ctx, mainRouter)
+
+	n := negroni.New(getNegroniHandlers(ctx, mainRouter)...)
+	n.UseHandler(context.ClearHandler(mainRouter))
+	return n
+}
+
+type registerRoutesSettingsObserver struct {
+	ctx    *RouterContext
+	server *graceful.Server
+}
+
+func (r *registerRoutesSettingsObserver) OnSettingsReloaded() {
+	r.ctx.Logger.Debug("Settings reloaded, now re-registering routers")
+	r.server.Handler = nil
+	r.server.Handler = createAndRegisterRoutersHandler(r.ctx)
+}
+
 func main() {
 	fmt.Println("")
 	fmt.Println("")
@@ -104,22 +124,24 @@ func main() {
 	ctx := NewRouterContext(settings)
 	settings.SubscribeReloadObserver(ctx)
 
-	mainRouter := mux.NewRouter().StrictSlash(true)
-	setupApiV1Routes(ctx, mainRouter)
-
-	n := negroni.New(getNegroniHandlers(ctx, mainRouter)...)
-	n.UseHandler(mainRouter)
-	http.Handle("/", context.ClearHandler(n))
-
 	backendUrl, err := url.Parse(settings.ServerBackendUrl())
 	CheckError(err)
 
 	ctx.Logger.Info("Now serving on %s", settings.ServerBackendUrl())
 
-	hostWithPossiblePortOnly := backendUrl.Host
-	if settings.IsDevMode() {
-		graceful.Run(hostWithPossiblePortOnly, 0, n)
-	} else {
-		graceful.Run(hostWithPossiblePortOnly, 5*time.Second, n) //Graceful shutdown to allow 5 seconds to close connections
+	var gracefulTimeout time.Duration = 0
+	if !settings.IsDevMode() {
+		gracefulTimeout = 5 * time.Second
 	}
+
+	srv := &graceful.Server{
+		Timeout: gracefulTimeout,
+		Server:  &http.Server{Addr: backendUrl.Host, Handler: createAndRegisterRoutersHandler(ctx)},
+	}
+
+	r := &registerRoutesSettingsObserver{ctx, srv}
+	settings.SubscribeReloadObserver(r)
+
+	err = srv.ListenAndServe()
+	CheckError(err)
 }

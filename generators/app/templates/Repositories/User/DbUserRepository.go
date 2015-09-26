@@ -49,7 +49,7 @@ func (r *repo) GetById(id int64) User {
 	)
 	err := row.StructScan(usr)
 	if err != nil {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "User missing or not activated"))
+		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "[1443259048] User missing or not activated"))
 	}
 	CheckError(err)
 
@@ -76,7 +76,7 @@ func (r *repo) GetByEmail(email string) User {
 	)
 	err := row.StructScan(usr)
 	if err != nil {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "User missing or not activated"))
+		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "[1443259049] User missing or not activated"))
 	}
 	CheckError(err)
 
@@ -95,7 +95,7 @@ func (r *repo) VerifyAndGetUserFromCredentials(email, guessedPassword string) Us
 		1)
 	err := row.StructScan(usrWithPwd)
 	if err != nil {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "User missing or not activated"))
+		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "[1443259050] User missing or not activated"))
 	}
 	CheckError(err)
 

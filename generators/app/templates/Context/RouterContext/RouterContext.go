@@ -119,7 +119,7 @@ func (r *RouterContext) getKeyValueStorage() KeyValueStorage {
 
 func (r *RouterContext) getUserRepository() UserRepository {
 	if r.Settings.UseMock() {
-		return NewMockUserRepository()
+		return NewMockUserRepository(r.Logger)
 	} else {
 		return NewDbUserRepository(r.Logger, r.Misc.ErrorsService, r.Misc.EncryptionService, r.dbStorage)
 	}
