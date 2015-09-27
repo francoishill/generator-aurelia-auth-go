@@ -1,10 +1,9 @@
 package User
 
 import (
-	. "github.com/francoishill/golang-common-ddd/Interface/Logger"
-	"net/http"
 	"strconv"
 
+	. "github.com/francoishill/golang-common-ddd/Interface/Logger"
 	. "github.com/francoishill/golang-common-ddd/Interface/Misc/Encryption"
 	. "github.com/francoishill/golang-common-ddd/Interface/Misc/Errors"
 	. "github.com/francoishill/golang-common-ddd/Interface/Storage/DbStorage"
@@ -49,7 +48,7 @@ func (r *repo) GetById(id int64) User {
 	)
 	err := row.StructScan(usr)
 	if err != nil {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "[1443259048] User missing or not activated"))
+		panic(r.errorsService.CreateHttpStatusClientError_Unauthorized("[1443259048] User missing or not activated"))
 	}
 	CheckError(err)
 
@@ -76,7 +75,7 @@ func (r *repo) GetByEmail(email string) User {
 	)
 	err := row.StructScan(usr)
 	if err != nil {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "[1443259049] User missing or not activated"))
+		panic(r.errorsService.CreateHttpStatusClientError_Unauthorized("[1443259049] User missing or not activated"))
 	}
 	CheckError(err)
 
@@ -95,13 +94,13 @@ func (r *repo) VerifyAndGetUserFromCredentials(email, guessedPassword string) Us
 		1)
 	err := row.StructScan(usrWithPwd)
 	if err != nil {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "[1443259050] User missing or not activated"))
+		panic(r.errorsService.CreateHttpStatusClientError_Unauthorized("[1443259050] User missing or not activated"))
 	}
 	CheckError(err)
 
 	matched := r.encryption.PasswordMatchHex(guessedPassword, usrWithPwd.HexSalt, usrWithPwd.HexHashedPassword)
 	if !matched {
-		panic(r.errorsService.CreateClientError(http.StatusUnauthorized, "User not found"))
+		panic(r.errorsService.CreateHttpStatusClientError_Unauthorized("User not found"))
 	}
 
 	return usrWithPwd.toUser()
@@ -122,17 +121,17 @@ func (r *repo) Insert(fullName, email, rawPassword string) User {
 
 	if err != nil {
 		if r.emailAlreadyExists(email) {
-			panic(r.errorsService.CreateClientError(http.StatusBadRequest, "This email already exists"))
+			panic(r.errorsService.CreateHttpStatusClientError_BadRequest("This email already exists"))
 		}
 
 		r.logger.Error("Unexpected insert user error: %s", err.Error())
-		panic(r.errorsService.CreateClientError(http.StatusInternalServerError, ""))
+		panic(r.errorsService.CreateHttpStatusClientError_InternalServerError(""))
 	}
 
 	lastId, err := result.LastInsertId()
 	if err != nil {
 		r.logger.Error("Unexpected insert user (LastInsertId) error: %s", err.Error())
-		panic(r.errorsService.CreateClientError(http.StatusInternalServerError, ""))
+		panic(r.errorsService.CreateHttpStatusClientError_InternalServerError(""))
 	}
 
 	return NewUser(lastId, fullName, email)
