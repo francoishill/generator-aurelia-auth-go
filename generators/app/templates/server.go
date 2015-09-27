@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/codegangsta/negroni"
 	. "github.com/francoishill/golang-web-dry/errors/checkerror"
+	. "github.com/francoishill/golang-web-dry/middleware/accessloggingmiddleware"
 	. "github.com/francoishill/golang-web-dry/middleware/recoverymiddleware"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/context"
@@ -18,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/francoishill/golang-common-ddd/Interface/Logger"
 	. "github.com/francoishill/golang-common-ddd/Interface/Misc/Errors/ClientError"
 	. "github.com/francoishill/golang-common-ddd/Interface/Security/Authentication"
 
@@ -27,24 +27,6 @@ import (
 	. "<%= OWN_GO_IMPORT_PATH %>/Routers/Setup"
 	"<%= OWN_GO_IMPORT_PATH %>/Settings/DefaultSettings"
 )
-
-type routerRecoveryHandler struct {
-	logger Logger
-}
-
-func (t *routerRecoveryHandler) onRouterRecoveryError(errDetails *RecoveredErrorDetails) *RecoveryResponse {
-	switch errObj := errDetails.OriginalError.(type) {
-	case *ClientError:
-		//No logging for this error, this is client side only
-		return &RecoveryResponse{
-			errObj.StatusCode,
-			errObj.StatusText,
-		}
-	default:
-		t.logger.Error("ERROR recovered: %s\nStack:\n%s", errDetails.Error, errDetails.StackTrace)
-		return nil
-	}
-}
 
 func getBaseUrlWithoutSlash(url string) string {
 	returnUrl := url
@@ -57,10 +39,19 @@ func getBaseUrlWithoutSlash(url string) string {
 func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handler {
 	tmpArray := []negroni.Handler{}
 
-	routerRecoveryWrapper := &routerRecoveryHandler{ctx.Logger}
-
-	tmpArray = append(tmpArray, NewRecovery(routerRecoveryWrapper.onRouterRecoveryError))
-	tmpArray = append(tmpArray, negroni.NewLogger())
+	tmpArray = append(tmpArray, NewRecovery(func(errDetails *RecoveredErrorDetails) *RecoveryResponse {
+		switch errObj := errDetails.OriginalError.(type) {
+		case *ClientError:
+			//No logging for this error, this is client side only
+			return &RecoveryResponse{
+				errObj.StatusCode,
+				errObj.StatusText,
+			}
+		default:
+			ctx.Logger.Error("ERROR recovered: %s\nStack:\n%s", errDetails.Error, errDetails.StackTrace)
+			return nil
+		}
+	}))
 
 	if frontendUrl := ctx.Settings.ServerFrontendUrl(); strings.TrimSpace(frontendUrl) != "" {
 		tmpArray = append(tmpArray, cors.New(cors.Options{
@@ -70,6 +61,12 @@ func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handle
 	}
 
 	if ctx.Settings.IsDevMode() {
+		tmpArray = append(tmpArray, NewAccessLoggingMiddleware(func(info *AccessInfo) {
+			ctx.Logger.Debug(
+				"ACCESS: RemoteAddr: %s, RemoteIP: %s, RequestURI: %s, UserAgent: %s, Proxies: %s",
+				info.RemoteAddr, info.RemoteIP, info.RequestURI, info.UserAgent, info.Proxies)
+		}))
+		
 		middleware := stats.New()
 		router.HandleFunc("/stats.json", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
