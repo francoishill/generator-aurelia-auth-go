@@ -25,8 +25,8 @@ import (
 	"github.com/francoishill/golang-common-ddd/Implementations/Storage/DbStorage/DatabaseSqlxDbStorage"
 	"github.com/francoishill/golang-common-ddd/Implementations/Storage/KeyValueStorage/RedisKeyValueStorage"
 
-	"<%= OWN_GO_IMPORT_PATH %>/Authentication/DefaultAuthUserHelperService"
-	"<%= OWN_GO_IMPORT_PATH %>/Authentication/DefaultAuthenticationService"
+	"<%= OWN_GO_IMPORT_PATH %>/Services/Authentication/DefaultAuthUserHelperService"
+	"<%= OWN_GO_IMPORT_PATH %>/Services/Authentication/DefaultAuthenticationService"
 	. "<%= OWN_GO_IMPORT_PATH %>/Entities/User"
 	. "<%= OWN_GO_IMPORT_PATH %>/Interface/Authentication"
 	. "<%= OWN_GO_IMPORT_PATH %>/Repositories/User"
