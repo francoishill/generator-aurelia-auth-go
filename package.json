@@ -7,7 +7,7 @@
     ],
     "keywords": ["yeoman-generator"],
     "dependencies": {
-        "yeoman-generator": "^0.20.2"
+        "yeoman-generator": "0.20.3"
     },
     "devDependencies": {
         "yeoman": "~0.9.1"
