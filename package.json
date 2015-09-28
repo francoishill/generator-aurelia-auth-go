@@ -20,5 +20,8 @@
     "author": {
         "name": "Francois Hill",
         "email": "francoishill11@gmail.com"
+    },
+    "scripts": {
+        "test": "node_modules/.bin/yeoman test --verbose"
     }
 }
