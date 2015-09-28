@@ -11,7 +11,7 @@
     },
     "devDependencies": {
         "yeoman": "~0.9.1"
-    }
+    },
     "repository": {
         "type": "git",
         "url": "git://francoishill/generator-aurelia-auth-go.git"
