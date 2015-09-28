@@ -61,11 +61,24 @@ func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handle
 	}
 
 	if ctx.Settings.IsDevMode() {
-		tmpArray = append(tmpArray, NewAccessLoggingMiddleware(func(info *AccessInfo) {
-			ctx.Logger.Debug(
-				"ACCESS: HttpMethod: %s, RemoteAddr: %s, RemoteIP: %s, RequestURI: %s, UserAgent: %s, Proxies: %s",
-				info.HttpMethod, info.RemoteAddr, info.RemoteIP, info.RequestURI, info.UserAgent, info.Proxies)
-		}))
+		tmpArray = append(tmpArray, NewAccessLoggingMiddleware(NewSimpleAccessInfoHandler(
+			func(info *StartAccessInfo) {
+				ctx.Logger.Debug(
+					"START:     %s %s, RemAddr: %s, RemIP: %s, Proxies: %s",
+					info.HttpMethod, info.RequestURI, info.RemoteAddr, info.RemoteIP, info.Proxies)
+			},
+			func(info *EndAccessInfo) {
+				if !info.GotPanic {
+					ctx.Logger.Debug(
+						"END [OK]:  %s %s, Status: %d %s, Duration: %s",
+						info.HttpMethod, info.RequestURI, info.Status, info.StatusText, info.Duration)
+				} else {
+					ctx.Logger.Debug(
+						"END [ERR]: %s %s, Status: %d %s, Duration: %s",
+						info.HttpMethod, info.RequestURI, info.Status, info.StatusText, info.Duration)
+				}
+			},
+		)))
 		
 		middleware := stats.New()
 		router.HandleFunc("/stats.json", func(w http.ResponseWriter, r *http.Request) {
