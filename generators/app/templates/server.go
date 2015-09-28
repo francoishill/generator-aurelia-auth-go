@@ -63,8 +63,8 @@ func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handle
 	if ctx.Settings.IsDevMode() {
 		tmpArray = append(tmpArray, NewAccessLoggingMiddleware(func(info *AccessInfo) {
 			ctx.Logger.Debug(
-				"ACCESS: RemoteAddr: %s, RemoteIP: %s, RequestURI: %s, UserAgent: %s, Proxies: %s",
-				info.RemoteAddr, info.RemoteIP, info.RequestURI, info.UserAgent, info.Proxies)
+				"ACCESS: HttpMethod: %s, RemoteAddr: %s, RemoteIP: %s, RequestURI: %s, UserAgent: %s, Proxies: %s",
+				info.HttpMethod, info.RemoteAddr, info.RemoteIP, info.RequestURI, info.UserAgent, info.Proxies)
 		}))
 		
 		middleware := stats.New()
