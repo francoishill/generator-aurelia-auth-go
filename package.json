@@ -9,6 +9,9 @@
     "dependencies": {
         "yeoman-generator": "^0.20.2"
     },
+    "devDependencies": {
+        "yeoman": "~0.9.1"
+    }
     "repository": {
         "type": "git",
         "url": "git://francoishill/generator-aurelia-auth-go.git"
