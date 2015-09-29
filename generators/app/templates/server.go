@@ -20,7 +20,6 @@ import (
 	"time"
 
 	. "github.com/francoishill/golang-common-ddd/Interface/Misc/Errors/ClientError"
-	. "github.com/francoishill/golang-common-ddd/Interface/Security/Authentication"
 
 	. "<%= OWN_GO_IMPORT_PATH %>/Context/RouterContext"
 	"<%= OWN_GO_IMPORT_PATH %>/Routers"
