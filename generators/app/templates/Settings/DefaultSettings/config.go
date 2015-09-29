@@ -64,10 +64,10 @@ func (c *config) Validate() {
 	c.assertNotBlank(c.Server.FrontendUrl, "Server FrontendUrl cannot be blank")
 	c.assertNotBlank(c.Server.BackendUrl, "Server BackendUrl cannot be blank")
 	c.assertNotBlank(c.Database.MysqlDataSource, "Database MysqlDataSource cannot be blank")
-	c.assertDirExists(c.Database.MysqlMigrationsDir, "Database MysqlMigrationsDir cannot be blank")
+	c.assertDirExists(c.Database.MysqlMigrationsDir, fmt.Sprintf("Database MysqlMigrationsDir ('%s') must be an existing dir", c.Database.MysqlMigrationsDir))
 	c.assertNotBlank(c.Redis.HostAndPort, "Redis HostAndPort cannot be blank")
-	c.assertFileExists(c.Jwt.PrivateKeyFilePath, "Jwt PrivateKeyFilePath cannot be blank")
-	c.assertFileExists(c.Jwt.PublicKeyFilePath, "Jwt PublicKeyFilePath cannot be blank")
+	c.assertFileExists(c.Jwt.PrivateKeyFilePath, fmt.Sprintf("Jwt PrivateKeyFilePath ('%s') must be an existing file", c.Jwt.PrivateKeyFilePath))
+	c.assertFileExists(c.Jwt.PublicKeyFilePath, fmt.Sprintf("Jwt PublicKeyFilePath ('%s') must be an existing file", c.Jwt.PublicKeyFilePath))
 }
 
 func loadConfigFile(configPath string) *config {
