@@ -38,20 +38,6 @@ func getBaseUrlWithoutSlash(url string) string {
 func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handler {
 	tmpArray := []negroni.Handler{}
 
-	tmpArray = append(tmpArray, NewRecovery(func(errDetails *RecoveredErrorDetails) *RecoveryResponse {
-		switch errObj := errDetails.OriginalError.(type) {
-		case *ClientError:
-			//No logging for this error, this is client side only
-			return &RecoveryResponse{
-				errObj.StatusCode,
-				errObj.StatusText,
-			}
-		default:
-			ctx.Logger.Error("ERROR recovered: %s\nStack:\n%s", errDetails.Error, errDetails.StackTrace)
-			return nil
-		}
-	}))
-
 	if frontendUrl := ctx.Settings.ServerFrontendUrl(); strings.TrimSpace(frontendUrl) != "" {
 		tmpArray = append(tmpArray, cors.New(cors.Options{
 			AllowedOrigins: []string{getBaseUrlWithoutSlash(frontendUrl)},
@@ -78,7 +64,7 @@ func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handle
 				}
 			},
 		)))
-		
+
 		middleware := stats.New()
 		router.HandleFunc("/stats.json", func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -87,6 +73,20 @@ func getNegroniHandlers(ctx *RouterContext, router *mux.Router) []negroni.Handle
 		})
 		tmpArray = append(tmpArray, middleware)
 	}
+
+	tmpArray = append(tmpArray, NewRecovery(func(errDetails *RecoveredErrorDetails) *RecoveryResponse {
+		switch errObj := errDetails.OriginalError.(type) {
+		case *ClientError:
+			//No logging for this error, this is client side only
+			return &RecoveryResponse{
+				errObj.StatusCode,
+				errObj.StatusText,
+			}
+		default:
+			ctx.Logger.Error("ERROR recovered: %s\nStack:\n%s", errDetails.Error, errDetails.StackTrace)
+			return nil
+		}
+	}))
 
 	return tmpArray
 }
@@ -100,9 +100,19 @@ func setupApiV1Routes(ctx *RouterContext, router *mux.Router) {
 	RegisterRouters(ctx, apiV1Router, baseRouterMiddleware, routers)
 }
 
+type notFoundHandler struct {
+	ctx *RouterContext
+}
+
+func (n *notFoundHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	panic(n.ctx.Misc.ErrorsService.CreateHttpStatusClientError_NotFound("Page not found"))
+}
+
 func createAndRegisterRoutersHandler(ctx *RouterContext) http.Handler {
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	setupApiV1Routes(ctx, mainRouter)
+
+	mainRouter.NotFoundHandler = &notFoundHandler{ctx}
 
 	n := negroni.New(getNegroniHandlers(ctx, mainRouter)...)
 	n.UseHandler(context.ClearHandler(mainRouter))

@@ -1,6 +1,7 @@
 package User
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -29,6 +30,14 @@ func (u *user) Email() string     { return u.email }
 func (u *user) SetFullName(fullName string) { u.fullName = fullName }
 
 func (u *user) Clone() User { return NewUser(u.id, u.fullName, u.email) }
+
+func (u *user) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
+		Id       int64
+		FullName string
+		Email    string
+	}{u.id, u.fullName, u.email})
+}
 
 func NewUser(id int64, fullname, email string) *user {
 	return &user{

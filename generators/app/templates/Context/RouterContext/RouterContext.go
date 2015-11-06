@@ -27,8 +27,11 @@ import (
 
 	"<%= OWN_GO_IMPORT_PATH %>/Services/Authentication/DefaultAuthUserHelperService"
 	"<%= OWN_GO_IMPORT_PATH %>/Services/Authentication/DefaultAuthenticationService"
+	"<%= OWN_GO_IMPORT_PATH %>/Services/Authorization/DefaultAuthorizationMiddleware"
+	"<%= OWN_GO_IMPORT_PATH %>/Services/Authorization/DefaultAuthorizationService"
 	. "<%= OWN_GO_IMPORT_PATH %>/Entities/User"
 	. "<%= OWN_GO_IMPORT_PATH %>/Interface/Authentication"
+	. "<%= OWN_GO_IMPORT_PATH %>/Interface/Authorization"
 	. "<%= OWN_GO_IMPORT_PATH %>/Repositories/User"
 	. "<%= OWN_GO_IMPORT_PATH %>/Settings"
 )
@@ -42,7 +45,8 @@ type MiscServices struct {
 }
 
 type Middlewares struct {
-	Auth AuthenticationMiddleware
+	Authentication AuthenticationMiddleware
+	Authorization  AuthorizationMiddleware
 }
 
 type RouterContext struct {
@@ -59,6 +63,8 @@ type RouterContext struct {
 	Settings
 
 	AuthenticationService
+	AuthorizationService AuthorizationService
+	
 	*Middlewares
 	Misc *MiscServices
 }
@@ -87,8 +93,10 @@ func (r *RouterContext) loadRepos() {
 	r.authUserHelperService = r.getAuthUserHelperService()
 
 	r.AuthenticationService = r.getAuthenticationService()
+	r.AuthorizationService = r.getAuthorizationService()
 	r.Middlewares = &Middlewares{
 		r.getAuthenticationMiddleware(),
+		r.getAuthorizationMiddleware(),
 	}
 }
 
@@ -144,6 +152,14 @@ func (r *RouterContext) getAuthenticationService() AuthenticationService {
 
 func (r *RouterContext) getAuthenticationMiddleware() AuthenticationMiddleware {
 	return DefaultAuthenticationMiddleware.New(r.AuthenticationService)
+}
+
+func (r *RouterContext) getAuthorizationMiddleware() AuthorizationMiddleware {
+	return DefaultAuthorizationMiddleware.New(r.AuthenticationService, r.AuthorizationService)
+}
+
+func (r *RouterContext) getAuthorizationService() AuthorizationService {
+	return DefaultAuthorizationService.New()
 }
 
 func (r *RouterContext) getHttpRenderHelperService() HttpRenderHelperService {

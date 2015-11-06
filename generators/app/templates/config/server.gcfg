@@ -18,8 +18,8 @@
 [Jwt]
     # Download openssl from https://indy.fulgan.com/SSL/
     # Choose keysize (here we use 2048)
-    # Then generate pvt key `openssl genrsa -out app.rsa 2048`
-    # and pub key `openssl rsa -in app.rsa -pubout > app.rsa.pub`
+    # Then generate pvt key `openssl genrsa -out jwt.rsa 2048`
+    # and pub key `openssl rsa -in jwt.rsa -pubout > jwt.rsa.pub`
     PrivateKeyFilePath = ./config/jwt.rsa
     PublicKeyFilePath = ./config/jwt.rsa.pub
     ExpirationDeltaHours = <%= JWT_EXPIRATION_HOURS %>

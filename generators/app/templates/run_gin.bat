@@ -12,3 +12,5 @@ GOTO EOF
 
 gin -p 12201 -a 12301 -i run "./config/server.gcfg"
 pause
+
+:EOF

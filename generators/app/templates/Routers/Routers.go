@@ -22,7 +22,7 @@ func GetRouters(ctx *RouterContext) []*Router {
 			Build(),
 
 		NewRouterBuilder("/user-details").
-			AddMiddlewares(ctx.Middlewares.Auth.CheckAuthentication).
+			AddMiddlewares(ctx.Middlewares.Authentication.CheckAuthentication).
 			SetController(NewUserDetailsController()).
 			Build(),
 	}

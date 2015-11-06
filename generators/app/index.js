@@ -77,8 +77,6 @@ module.exports = generators.Base.extend({
 
             'config/server.gcfg',
 
-            'Authentication/DefaultAuthenticationService/service.go',
-            'Authentication/DefaultAuthUserHelperService/service.go',
             'Context/RouterContext/RouterContext.go',
             'Controllers/Auth/Login/controller.go',
             'Controllers/Auth/Logout/controller.go',
@@ -88,6 +86,8 @@ module.exports = generators.Base.extend({
             'Entities/User/User.go',
             'Entities/User/UserRepository.go',
             'Interface/Authentication/AuthenticationService.go',
+            'Interface/Authorization/AuthorizationMiddleware.go',
+            'Interface/Authorization/AuthorizationService.go',
             'Repositories/User/DbUserRepository.go',
             'Repositories/User/MockUserRepository.go',
             'Routers/Routers.go',
@@ -97,6 +97,10 @@ module.exports = generators.Base.extend({
             'Routers/Setup/RegisterRouters.go',
             'Routers/Setup/Router.go',
             'Routers/Setup/RouterBuilder.go',
+            'Services/Authentication/DefaultAuthenticationService/service.go',
+            'Services/Authentication/DefaultAuthUserHelperService/service.go',
+            'Services/Authorization/DefaultAuthorizationMiddleware/middleware.go',
+            'Services/Authorization/DefaultAuthorizationService/service.go',
             'Settings/DefaultSettings/config.go',
             'Settings/DefaultSettings/settings.go',
             'Settings/DefaultSettings/settingValues.go',
