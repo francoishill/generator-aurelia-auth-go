@@ -12,7 +12,7 @@ type RouterBuilder interface {
 }
 
 type routerBuilder struct {
-	urlPart     string
+	urlParts    []string
 	middlewares []http.HandlerFunc
 	controller  Controller
 	subRouters  []*Router
@@ -39,16 +39,16 @@ func (r *routerBuilder) Build() *Router {
 	}
 
 	return &Router{
-		r.urlPart,
+		r.urlParts,
 		r.middlewares,
 		r.controller,
 		r.subRouters,
 	}
 }
 
-func NewRouterBuilder(urlPart string) RouterBuilder {
+func NewRouterBuilder(urlParts ...string) RouterBuilder {
 	return &routerBuilder{
-		urlPart,
+		urlParts,
 		[]http.HandlerFunc{},
 		nil,
 		[]*Router{},

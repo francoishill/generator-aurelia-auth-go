@@ -5,7 +5,7 @@ import (
 )
 
 type Router struct {
-	urlPart     string
+	urlParts    []string
 	middlewares []http.HandlerFunc
 	controller  Controller
 	subRouters  []*Router

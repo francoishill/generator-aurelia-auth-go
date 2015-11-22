@@ -19,17 +19,21 @@ func setupRouters(ctx *RouterContext, router *mux.Router, parentMiddleWare []htt
 
 		panicOnZeroMethods := len(rd.subRouters) == 0 //Panic if we have no controller methods and also no subrouters
 		for method, h := range GetControllerMethods(rd.controller, panicOnZeroMethods) {
-			muxRoute := router.Handle(rd.urlPart, newNegroniMiddleware(ctx, combinedMiddleWareHandlers, h))
-			muxRoute.Methods(method)
+			for _, urlPart := range rd.urlParts {
+				muxRoute := router.Handle(urlPart, newNegroniMiddleware(ctx, combinedMiddleWareHandlers, h))
+				muxRoute.Methods(method)
+			}
 		}
 
-		var subRouterToUse *mux.Router
-		if rd.urlPart != "" {
-			subRouterToUse = router.PathPrefix(rd.urlPart).Subrouter()
-		} else {
-			subRouterToUse = router
+		for _, urlPart := range rd.urlParts {
+			var subRouterToUse *mux.Router
+			if urlPart != "" {
+				subRouterToUse = router.PathPrefix(urlPart).Subrouter()
+			} else {
+				subRouterToUse = router
+			}
+			setupRouters(ctx, subRouterToUse, combinedMiddleWareHandlers, rd.subRouters)
 		}
-		setupRouters(ctx, subRouterToUse, combinedMiddleWareHandlers, rd.subRouters)
 	}
 }
 
