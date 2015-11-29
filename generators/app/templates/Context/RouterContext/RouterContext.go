@@ -134,7 +134,7 @@ func (r *RouterContext) getUserRepository() UserRepository {
 }
 
 func (r *RouterContext) getJwtHelperService() JwtHelperService {
-	return DefaultJwtHelperService.New(r.keyValueStorage)
+	return DefaultJwtHelperService.New(r.Logger, r.Misc.ErrorsService, r.keyValueStorage)	
 }
 
 func (r *RouterContext) getAuthUserHelperService() BaseAuthUserHelperService {
